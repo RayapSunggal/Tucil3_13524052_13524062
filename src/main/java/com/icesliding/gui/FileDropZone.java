@@ -144,7 +144,7 @@ class FileDropZone extends JPanel {
         if (value==null || value.length()<=max){
             return value;
         }
-        return value.substring(0, Math.max(0, max - 3)) + "...";
+        return value.substring(0, Math.max(0, max-3))+"...";
     }
 
     @Override
@@ -165,7 +165,7 @@ class FileDropZone extends JPanel {
         float[] dash=state==State.EMPTY ? new float[]{9f, 6f} : new float[]{1f, 0f};
         g2.setStroke(new BasicStroke(1.5f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 0, dash, 0));
         g2.setColor(border);
-        g2.draw(new RoundRectangle2D.Float(1, 1, w - 2, h - 2, 8, 8));
+        g2.draw(new RoundRectangle2D.Float(1, 1, w-2, h-2, 8, 8));
 
         paintGlyph(g2, w);
 
@@ -201,30 +201,30 @@ class FileDropZone extends JPanel {
     }
 
     private void paintGlyph(Graphics2D g2, int width) {
-        int cx=width / 2;
+        int cx=width/2;
         int cy=28;
         Color color=borderColor();
         g2.setStroke(new BasicStroke(2.2f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
         g2.setColor(color);
 
         if (state==State.VALID){
-            g2.drawLine(cx - 9, cy, cx - 2, cy + 7);
-            g2.drawLine(cx - 2, cy + 7, cx + 11, cy - 8);
+            g2.drawLine(cx-9, cy, cx-2, cy+7);
+            g2.drawLine(cx-2, cy+7, cx+11, cy-8);
         }
         else if (state==State.INVALID){
-            g2.drawLine(cx - 9, cy - 9, cx + 9, cy + 9);
-            g2.drawLine(cx + 9, cy - 9, cx - 9, cy + 9);
+            g2.drawLine(cx-9, cy-9, cx+9, cy+9);
+            g2.drawLine(cx+9, cy-9, cx-9, cy+9);
         }
         else{
-            g2.drawLine(cx, cy + 11, cx, cy - 10);
-            g2.drawLine(cx - 8, cy - 2, cx, cy - 10);
-            g2.drawLine(cx + 8, cy - 2, cx, cy - 10);
-            g2.drawLine(cx - 12, cy + 12, cx + 12, cy + 12);
+            g2.drawLine(cx, cy+11, cx, cy-10);
+            g2.drawLine(cx-8, cy-2, cx, cy-10);
+            g2.drawLine(cx+8, cy-2, cx, cy-10);
+            g2.drawLine(cx-12, cy+12, cx+12, cy+12);
         }
     }
 
     private void drawCentered(Graphics2D g2, String text, int baselineY, int width) {
         FontMetrics fm=g2.getFontMetrics();
-        g2.drawString(text, (width - fm.stringWidth(text)) / 2, baselineY);
+        g2.drawString(text, (width-fm.stringWidth(text))/2, baselineY);
     }
 }

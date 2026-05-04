@@ -76,21 +76,21 @@ class ValidationPanel extends JPanel {
     void showValid(File file, ValidationReport report) {
         statusDot.setColor(UITheme.GREEN);
         title.setText("Input valid");
-        message.setText(file.getName() + " sudah sesuai format spesifikasi.");
+        message.setText(file.getName()+" sudah sesuai format spesifikasi.");
         metrics.removeAll();
-        addMetric("Ukuran", report.getRows() + " x " + report.getCols());
-        addMetric("Checkpoint", report.getCheckpointCount()==0 ? "Tidak ada" : report.getCheckpointCount() + " titik");
+        addMetric("Ukuran", report.getRows()+" x "+report.getCols());
+        addMetric("Checkpoint", report.getCheckpointCount()==0 ? "Tidak ada" : report.getCheckpointCount()+" titik");
         addMetric("Batu", String.valueOf(report.getWallCount()));
         addMetric("Lava", String.valueOf(report.getLavaCount()));
         addMetric("Path", String.valueOf(report.getPathCount()));
-        addMetric("Cost", report.getMinCost() + " - " + report.getMaxCost());
+        addMetric("Cost", report.getMinCost()+" - "+report.getMaxCost());
         refresh();
     }
 
     void showInvalid(File file, String error) {
         statusDot.setColor(UITheme.RED);
         title.setText("Input perlu diperbaiki");
-        message.setText(file.getName() + ": " + error);
+        message.setText(file.getName()+": "+error);
         metrics.removeAll();
         addMetric("Status", "Gagal validasi");
         addMetric("Preview", "Dikosongkan");
@@ -100,7 +100,7 @@ class ValidationPanel extends JPanel {
     void showReadError(File file, String error) {
         statusDot.setColor(UITheme.RED);
         title.setText("File tidak bisa dibaca");
-        message.setText(file.getName() + ": " + error);
+        message.setText(file.getName()+": "+error);
         metrics.removeAll();
         addMetric("Status", "Gagal dibuka");
         addMetric("Preview", "Dikosongkan");
@@ -136,7 +136,7 @@ class ValidationPanel extends JPanel {
             g2.setColor(UITheme.SURFACE_ALT);
             g2.fill(new RoundRectangle2D.Float(0, 0, getWidth(), getHeight(), 8, 8));
             g2.setColor(UITheme.BORDER);
-            g2.draw(new RoundRectangle2D.Float(0.5f, 0.5f, getWidth() - 1f, getHeight() - 1f, 8, 8));
+            g2.draw(new RoundRectangle2D.Float(0.5f, 0.5f, getWidth()-1f, getHeight()-1f, 8, 8));
 
             g2.setFont(UITheme.SMALL);
             g2.setColor(UITheme.INK_FAINT);
@@ -144,7 +144,7 @@ class ValidationPanel extends JPanel {
 
             g2.setFont(UITheme.BODY_BOLD);
             g2.setColor(UITheme.INK);
-            g2.drawString(fit(value, g2, getWidth() - 20), 10, 40);
+            g2.drawString(fit(value, g2, getWidth()-20), 10, 40);
             g2.dispose();
         }
 
@@ -153,10 +153,10 @@ class ValidationPanel extends JPanel {
                 return text;
             }
             String clipped=text;
-            while (clipped.length() > 3 && g2.getFontMetrics().stringWidth(clipped + "...") > width){
-                clipped=clipped.substring(0, clipped.length() - 1);
+            while (clipped.length() > 3 && g2.getFontMetrics().stringWidth(clipped+"...") > width){
+                clipped=clipped.substring(0, clipped.length()-1);
             }
-            return clipped + "...";
+            return clipped+"...";
         }
     }
 

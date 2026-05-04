@@ -37,17 +37,17 @@ public final class InputValidator {
         }
 
         if (rows<=0 || cols<=0){
-            return ValidationReport.invalid("Dimensi papan harus positif. Ditemukan N=" + rows + ", M=" + cols + ".");
+            return ValidationReport.invalid("Dimensi papan harus positif. Ditemukan N="+rows+", M="+cols+".");
         }
 
-        int expectedLines=1 + rows + rows;
+        int expectedLines=1+rows+rows;
         if (lines.size() < expectedLines){
-            return ValidationReport.invalid("Jumlah baris kurang. Diperlukan " + expectedLines
-                    + " baris, tersedia " + lines.size() + ".");
+            return ValidationReport.invalid("Jumlah baris kurang. Diperlukan "+expectedLines+
+                    " baris, tersedia "+lines.size()+".");
         }
         if (lines.size() > expectedLines){
-            return ValidationReport.invalid("Jumlah baris berlebih. Format membutuhkan tepat " + expectedLines
-                    + " baris setelah mengabaikan baris kosong di akhir file.");
+            return ValidationReport.invalid("Jumlah baris berlebih. Format membutuhkan tepat "+expectedLines+
+                    " baris setelah mengabaikan baris kosong di akhir file.");
         }
 
         int startCount=0;
@@ -58,17 +58,17 @@ public final class InputValidator {
         int[] checkpointCounts=new int[10];
 
         for (int r=0; r < rows; r++){
-            String row=lines.get(1 + r);
+            String row=lines.get(1+r);
             if (row.length()!=cols){
-                return ValidationReport.invalid("Baris papan ke-" + (r + 1) + " memiliki panjang "
-                        + row.length() + ", seharusnya " + cols + ".");
+                return ValidationReport.invalid("Baris papan ke-"+(r+1)+" memiliki panjang "+
+                        row.length()+", seharusnya "+cols+".");
             }
 
             for (int c=0; c < cols; c++){
                 char tile=row.charAt(c);
                 if (VALID_TILES.indexOf(tile) < 0){
-                    return ValidationReport.invalid("Karakter '" + tile + "' pada baris papan ke-" + (r + 1)
-                            + ", kolom ke-" + (c + 1) + " tidak dikenali.");
+                    return ValidationReport.invalid("Karakter '"+tile+"' pada baris papan ke-"+(r+1)+
+                            ", kolom ke-"+(c+1)+" tidak dikenali.");
                 }
 
                 if (tile=='Z'){
@@ -87,7 +87,7 @@ public final class InputValidator {
                     pathCount++;
                 }
                 else if (tile>='0' && tile<='9'){
-                    checkpointCounts[tile - '0']++;
+                    checkpointCounts[tile-'0']++;
                 }
             }
         }
@@ -95,12 +95,12 @@ public final class InputValidator {
         if (startCount!=1){
             return ValidationReport.invalid(startCount==0
                     ? "Titik awal Z wajib ada tepat satu."
-                    : "Titik awal Z hanya boleh satu. Ditemukan " + startCount + ".");
+                    : "Titik awal Z hanya boleh satu. Ditemukan "+startCount+".");
         }
         if (goalCount!=1){
             return ValidationReport.invalid(goalCount==0
                     ? "Titik tujuan O wajib ada tepat satu."
-                    : "Titik tujuan O hanya boleh satu. Ditemukan " + goalCount + ".");
+                    : "Titik tujuan O hanya boleh satu. Ditemukan "+goalCount+".");
         }
 
         int checkpointTotal=validateCheckpoints(checkpointCounts);
@@ -112,15 +112,15 @@ public final class InputValidator {
         int maxCost=Integer.MIN_VALUE;
         long costTotal=0L;
         for (int r=0; r < rows; r++){
-            String line=lines.get(1 + rows + r).trim();
+            String line=lines.get(1+rows+r).trim();
             if (line.isEmpty()){
-                return ValidationReport.invalid("Baris cost ke-" + (r + 1) + " kosong.");
+                return ValidationReport.invalid("Baris cost ke-"+(r+1)+" kosong.");
             }
 
             String[] parts=line.split("\\s+");
             if (parts.length!=cols){
-                return ValidationReport.invalid("Baris cost ke-" + (r + 1) + " memiliki " + parts.length
-                        + " nilai, seharusnya " + cols + ".");
+                return ValidationReport.invalid("Baris cost ke-"+(r+1)+" memiliki "+parts.length+
+                        " nilai, seharusnya "+cols+".");
             }
 
             for (int c=0; c < cols; c++){
@@ -129,13 +129,13 @@ public final class InputValidator {
                     value=Integer.parseInt(parts[c]);
                 }
                 catch (NumberFormatException ex){
-                    return ValidationReport.invalid("Nilai cost '" + parts[c] + "' pada baris cost ke-"
-                            + (r + 1) + ", kolom ke-" + (c + 1) + " bukan bilangan bulat.");
+                    return ValidationReport.invalid("Nilai cost '"+parts[c]+"' pada baris cost ke-"+
+                            (r+1)+", kolom ke-"+(c+1)+" bukan bilangan bulat.");
                 }
 
                 if (value < 0){
-                    return ValidationReport.invalid("Cost pada baris ke-" + (r + 1) + ", kolom ke-"
-                            + (c + 1) + " tidak boleh negatif.");
+                    return ValidationReport.invalid("Cost pada baris ke-"+(r+1)+", kolom ke-"+
+                            (c+1)+" tidak boleh negatif.");
                 }
 
                 minCost=Math.min(minCost, value);
@@ -154,8 +154,8 @@ public final class InputValidator {
         }
 
         List<String> lines=new ArrayList<>(rawLines);
-        while (!lines.isEmpty() && lines.get(lines.size() - 1).trim().isEmpty()){
-            lines.remove(lines.size() - 1);
+        while (!lines.isEmpty() && lines.get(lines.size()-1).trim().isEmpty()){
+            lines.remove(lines.size()-1);
         }
         return lines;
     }
@@ -184,16 +184,16 @@ public final class InputValidator {
     private static String checkpointError(int[] counts) {
         for (int i=0; i < counts.length; i++){
             if (counts[i] > 1){
-                return "Checkpoint " + i + " hanya boleh muncul satu kali. Ditemukan " + counts[i] + ".";
+                return "Checkpoint "+i+" hanya boleh muncul satu kali. Ditemukan "+counts[i]+".";
             }
         }
 
         for (int i=0; i < counts.length; i++){
             if (counts[i]==0){
-                for (int j=i + 1; j < counts.length; j++){
+                for (int j=i+1; j < counts.length; j++){
                     if (counts[j]==1){
-                        return "Checkpoint harus berurutan mulai dari 0. Digit " + j
-                                + " ada, tetapi digit " + i + " tidak ada.";
+                        return "Checkpoint harus berurutan mulai dari 0. Digit "+j+
+                                " ada, tetapi digit "+i+" tidak ada.";
                     }
                 }
             }

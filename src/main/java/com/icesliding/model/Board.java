@@ -17,7 +17,9 @@ public class Board {
         grid=new char[rows][cols];
         cost=new int[rows][cols];
         checkpointPos=new int[10][2];
-        for (int[] pos : checkpointPos) Arrays.fill(pos, -1);
+        for (int[] pos : checkpointPos){
+            Arrays.fill(pos, -1);
+        }
         maxCheckpoint=-1;
     }
 

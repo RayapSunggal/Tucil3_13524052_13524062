@@ -20,7 +20,7 @@ public class InputParser {
 
         Board board=new Board(N, M);
         for (int i=0; i < N; i++){
-            String row=lines.get(1 + i);
+            String row=lines.get(1+i);
             for (int j=0; j < M; j++){
                 char c=row.charAt(j);
                 board.grid[i][j]=c;
@@ -33,7 +33,7 @@ public class InputParser {
                     board.goalCol=j;
                 }
                 if (c>='0' && c<='9'){
-                    int num=c - '0';
+                    int num=c-'0';
                     board.checkpointPos[num][0]=i;
                     board.checkpointPos[num][1]=j;
                     if (num > board.maxCheckpoint){
@@ -43,7 +43,7 @@ public class InputParser {
             }
         }
         for (int i=0; i < N; i++){
-            String[] parts=lines.get(1 + N + i).trim().split("\\s+");
+            String[] parts=lines.get(1+N+i).trim().split("\\s+");
             for (int j=0; j < M; j++){
                 board.cost[i][j]=Integer.parseInt(parts[j]);
             }
