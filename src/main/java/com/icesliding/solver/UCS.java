@@ -3,10 +3,7 @@ package com.icesliding.solver;
 import com.icesliding.model.Board;
 import com.icesliding.model.GameState;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.PriorityQueue;
-import java.util.ArrayList;
 import java.util.Comparator;
 
 class UCSNode {
