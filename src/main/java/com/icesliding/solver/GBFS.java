@@ -7,47 +7,47 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.PriorityQueue;
 
-public class Astar {
+public class GBFS {
 
     private final int hNum;
 
-    public Astar(int heuristicNum) { this.hNum=heuristicNum; }
+    public GBFS(int heuristicNum) { this.hNum = heuristicNum; }
 
     public SolverResult solve(Board board) {
-        long t0=System.currentTimeMillis();
+        long t0 = System.currentTimeMillis();
 
-        GameState initial=new GameState(board.startRow, board.startCol, 0, 0, null, '\0');
+        GameState initial = new GameState(board.startRow, board.startCol, 0, 0, null, '\0');
 
-        PriorityQueue<GameState> open=new PriorityQueue<>(
-                (a, b) -> Double.compare(a.gCost + h(a, board), b.gCost + h(b, board)));
+        // GBFS: order by heuristic only, ignoring path cost
+        PriorityQueue<GameState> open = new PriorityQueue<>(
+                (a, b) -> Double.compare(h(a, board), h(b, board)));
 
-        Map<String, Integer> best=new HashMap<>();
+        Map<String, Boolean> visited = new HashMap<>();
         open.add(initial);
-        int nodesVisited=0;
+        int nodesVisited = 0;
 
         while (!open.isEmpty()) {
-            GameState curr=open.poll();
-            String key=curr.key();
+            GameState curr = open.poll();
+            String key = curr.key();
 
-            if (best.containsKey(key) && best.get(key)<=curr.gCost) continue;
-            best.put(key, curr.gCost);
+            if (visited.containsKey(key)) continue;
+            visited.put(key, true);
             nodesVisited++;
 
             if (curr.nextCheckpoint > board.maxCheckpoint
-                    && curr.row==board.goalRow
-                    && curr.col==board.goalCol) {
+                    && curr.row == board.goalRow
+                    && curr.col == board.goalCol) {
                 return SolverResult.found(curr, nodesVisited, System.currentTimeMillis() - t0);
             }
 
-            for (int d=0; d < SlideSimulator.dirCount(); d++) {
-                int[] slide=SlideSimulator.slide(board, curr.row, curr.col, d, curr.nextCheckpoint);
-                if (slide==null) continue;
+            for (int d = 0; d < SlideSimulator.dirCount(); d++) {
+                int[] slide = SlideSimulator.slide(board, curr.row, curr.col, d, curr.nextCheckpoint);
+                if (slide == null) continue;
 
-                int newG=curr.gCost + slide[2];
-                GameState next=new GameState(slide[0], slide[1], slide[3], newG, curr, SlideSimulator.dirName(d));
-                String nextKey=next.key();
+                int newG = curr.gCost + slide[2];
+                GameState next = new GameState(slide[0], slide[1], slide[3], newG, curr, SlideSimulator.dirName(d));
 
-                if (!best.containsKey(nextKey) || best.get(nextKey) > newG) {
+                if (!visited.containsKey(next.key())) {
                     open.add(next);
                 }
             }
@@ -63,6 +63,7 @@ public class Astar {
         }
     }
 
+    // H1: Manhattan via checkpoint berikutnya → tujuan
     private int h1(GameState s, Board board) {
         if (s.nextCheckpoint > board.maxCheckpoint)
             return Math.abs(s.row - board.goalRow) + Math.abs(s.col - board.goalCol);
@@ -72,6 +73,7 @@ public class Astar {
                 + Math.abs(cr - board.goalRow) + Math.abs(cc - board.goalCol);
     }
 
+    // H2: Euclidean ke checkpoint berikutnya (jika ada), lalu ke tujuan
     private double h2(GameState s, Board board) {
         if (s.nextCheckpoint > board.maxCheckpoint) {
             double dr = s.row - board.goalRow, dc = s.col - board.goalCol;
