@@ -3,9 +3,9 @@ package com.icesliding.solver;
 import com.icesliding.model.Board;
 import com.icesliding.model.GameState;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.HashSet;
 import java.util.PriorityQueue;
+import java.util.Set;
 
 public class GBFS {
 
@@ -22,7 +22,7 @@ public class GBFS {
         PriorityQueue<GameState> open = new PriorityQueue<>(
                 (a, b) -> Double.compare(h(a, board), h(b, board)));
 
-        Map<String, Boolean> visited = new HashMap<>();
+        Set<String> visited = new HashSet<>();
         open.add(initial);
         int nodesVisited = 0;
 
@@ -30,8 +30,8 @@ public class GBFS {
             GameState curr = open.poll();
             String key = curr.key();
 
-            if (visited.containsKey(key)) continue;
-            visited.put(key, true);
+            if (visited.contains(key)) continue;
+            visited.add(key);
             nodesVisited++;
 
             if (curr.nextCheckpoint > board.maxCheckpoint
@@ -47,7 +47,7 @@ public class GBFS {
                 int newG = curr.gCost + slide[2];
                 GameState next = new GameState(slide[0], slide[1], slide[3], newG, curr, SlideSimulator.dirName(d));
 
-                if (!visited.containsKey(next.key())) {
+                if (!visited.contains(next.key())) {
                     open.add(next);
                 }
             }
@@ -59,6 +59,8 @@ public class GBFS {
     private double h(GameState s, Board board) {
         switch (hNum) {
             case 2:  return h2(s, board);
+            case 3:  return h3(s, board);
+            case 4:  return h4(s, board);
             default: return h1(s, board);
         }
     }
@@ -73,7 +75,7 @@ public class GBFS {
                 + Math.abs(cr - board.goalRow) + Math.abs(cc - board.goalCol);
     }
 
-    // H2: Euclidean ke checkpoint berikutnya (jika ada), lalu ke tujuan
+    // H2: Euclidean via checkpoint berikutnya → tujuan
     private double h2(GameState s, Board board) {
         if (s.nextCheckpoint > board.maxCheckpoint) {
             double dr = s.row - board.goalRow, dc = s.col - board.goalCol;
@@ -84,5 +86,30 @@ public class GBFS {
         double dr1 = s.row - cr,           dc1 = s.col - cc;
         double dr2 = cr - board.goalRow,   dc2 = cc - board.goalCol;
         return Math.sqrt(dr1 * dr1 + dc1 * dc1) + Math.sqrt(dr2 * dr2 + dc2 * dc2);
+    }
+
+    // H3: Chebyshev distance via checkpoint berikutnya → tujuan
+    private double h3(GameState s, Board board) {
+        if (s.nextCheckpoint > board.maxCheckpoint)
+            return Math.max(Math.abs(s.row - board.goalRow), Math.abs(s.col - board.goalCol));
+        int cr = board.checkpointPos[s.nextCheckpoint][0];
+        int cc = board.checkpointPos[s.nextCheckpoint][1];
+        return Math.max(Math.abs(s.row - cr), Math.abs(s.col - cc))
+             + Math.max(Math.abs(cr - board.goalRow), Math.abs(cc - board.goalCol));
+    }
+
+    // H4: Minkowski distance (p=3) via checkpoint berikutnya → tujuan
+    private double h4(GameState s, Board board) {
+        final double P = 3.0;
+        if (s.nextCheckpoint > board.maxCheckpoint) {
+            double dr = Math.abs(s.row - board.goalRow), dc = Math.abs(s.col - board.goalCol);
+            return Math.pow(Math.pow(dr, P) + Math.pow(dc, P), 1.0 / P);
+        }
+        int cr = board.checkpointPos[s.nextCheckpoint][0];
+        int cc = board.checkpointPos[s.nextCheckpoint][1];
+        double dr1 = Math.abs(s.row - cr),         dc1 = Math.abs(s.col - cc);
+        double dr2 = Math.abs(cr - board.goalRow),  dc2 = Math.abs(cc - board.goalCol);
+        return Math.pow(Math.pow(dr1, P) + Math.pow(dc1, P), 1.0 / P)
+             + Math.pow(Math.pow(dr2, P) + Math.pow(dc2, P), 1.0 / P);
     }
 }

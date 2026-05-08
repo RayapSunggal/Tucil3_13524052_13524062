@@ -3,9 +3,9 @@ package com.icesliding.solver;
 import com.icesliding.model.Board;
 import com.icesliding.model.GameState;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.HashSet;
 import java.util.PriorityQueue;
+import java.util.Set;
 
 public class Astar {
 
@@ -21,7 +21,7 @@ public class Astar {
         PriorityQueue<GameState> open=new PriorityQueue<>(
                 (a, b) -> Double.compare(a.gCost + h(a, board), b.gCost + h(b, board)));
 
-        Map<String, Integer> best=new HashMap<>();
+        Set<String> visited = new HashSet<>();
         open.add(initial);
         int nodesVisited=0;
 
@@ -29,8 +29,8 @@ public class Astar {
             GameState curr=open.poll();
             String key=curr.key();
 
-            if (best.containsKey(key) && best.get(key)<=curr.gCost) continue;
-            best.put(key, curr.gCost);
+            if (visited.contains(key)) continue;
+            visited.add(key);
             nodesVisited++;
 
             if (curr.nextCheckpoint > board.maxCheckpoint
@@ -45,9 +45,8 @@ public class Astar {
 
                 int newG=curr.gCost + slide[2];
                 GameState next=new GameState(slide[0], slide[1], slide[3], newG, curr, SlideSimulator.dirName(d));
-                String nextKey=next.key();
 
-                if (!best.containsKey(nextKey) || best.get(nextKey) > newG) {
+                if (!visited.contains(next.key())) {
                     open.add(next);
                 }
             }
@@ -59,6 +58,8 @@ public class Astar {
     private double h(GameState s, Board board) {
         switch (hNum) {
             case 2:  return h2(s, board);
+            case 3:  return h3(s, board);
+            case 4:  return h4(s, board);
             default: return h1(s, board);
         }
     }
@@ -68,8 +69,7 @@ public class Astar {
             return Math.abs(s.row - board.goalRow) + Math.abs(s.col - board.goalCol);
         int cr = board.checkpointPos[s.nextCheckpoint][0];
         int cc = board.checkpointPos[s.nextCheckpoint][1];
-        return Math.abs(s.row - cr) + Math.abs(s.col - cc)
-                + Math.abs(cr - board.goalRow) + Math.abs(cc - board.goalCol);
+        return Math.abs(s.row - cr) + Math.abs(s.col - cc) + Math.abs(cr - board.goalRow) + Math.abs(cc - board.goalCol);
     }
 
     private double h2(GameState s, Board board) {
@@ -82,5 +82,26 @@ public class Astar {
         double dr1 = s.row - cr,           dc1 = s.col - cc;
         double dr2 = cr - board.goalRow,   dc2 = cc - board.goalCol;
         return Math.sqrt(dr1 * dr1 + dc1 * dc1) + Math.sqrt(dr2 * dr2 + dc2 * dc2);
+    }
+
+    private double h3(GameState s, Board board) {
+        if (s.nextCheckpoint > board.maxCheckpoint)
+            return Math.max(Math.abs(s.row - board.goalRow), Math.abs(s.col - board.goalCol));
+        int cr = board.checkpointPos[s.nextCheckpoint][0];
+        int cc = board.checkpointPos[s.nextCheckpoint][1];
+        return Math.max(Math.abs(s.row - cr), Math.abs(s.col - cc)) + Math.max(Math.abs(cr - board.goalRow), Math.abs(cc - board.goalCol));
+    }
+
+    private double h4(GameState s, Board board) {
+        final double P = 3.0;
+        if (s.nextCheckpoint > board.maxCheckpoint) {
+            double dr = Math.abs(s.row - board.goalRow), dc = Math.abs(s.col - board.goalCol);
+            return Math.pow(Math.pow(dr, P) + Math.pow(dc, P), 1.0 / P);
+        }
+        int cr = board.checkpointPos[s.nextCheckpoint][0];
+        int cc = board.checkpointPos[s.nextCheckpoint][1];
+        double dr1 = Math.abs(s.row - cr),         dc1 = Math.abs(s.col - cc);
+        double dr2 = Math.abs(cr - board.goalRow),  dc2 = Math.abs(cc - board.goalCol);
+        return Math.pow(Math.pow(dr1, P) + Math.pow(dc1, P), 1.0 / P) + Math.pow(Math.pow(dr2, P) + Math.pow(dc2, P), 1.0 / P);
     }
 }

@@ -5,7 +5,7 @@ import com.icesliding.parser.InputParser;
 import com.icesliding.parser.InputValidator;
 import com.icesliding.parser.InputValidator.ValidationReport;
 import com.icesliding.solver.Astar;
-import com.icesliding.solver.BruteForceBacktrack;
+import com.icesliding.solver.DFS;
 import com.icesliding.solver.GBFS;
 import com.icesliding.solver.UCS;
 import com.icesliding.solver.SolverResult;
@@ -102,7 +102,7 @@ public class MainWindow extends JFrame {
         title.setForeground(UITheme.NAVY);
         title.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        JLabel subtitle = new JLabel("UCS / A* / GBFS / Brute Force Pathfinding");
+        JLabel subtitle = new JLabel("UCS / A* / GBFS / DFS Pathfinding");
         subtitle.setFont(UITheme.SUBTITLE);
         subtitle.setForeground(UITheme.INK_MUTED);
         subtitle.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -131,7 +131,7 @@ public class MainWindow extends JFrame {
 
         sidebar.add(buildPanel("Input",  fileDropZone, 155));
         sidebar.add(Box.createVerticalStrut(10));
-        sidebar.add(buildPanel("Solver", solverPanel,  285));
+        sidebar.add(buildPanel("Solver", solverPanel,  340));
         sidebar.add(Box.createVerticalGlue());
         return sidebar;
     }
@@ -355,7 +355,7 @@ public class MainWindow extends JFrame {
 
     // ── Solver ────────────────────────────────────────────────────────────────
 
-    // algorithm: 0=UCS, 1=A*, 2=GBFS, 3=Brute Force
+    // algorithm: 0=UCS, 1=A*, 2=GBFS, 3=DFS
     private void runSolver(int algorithm, int heuristic) {
         if (currentBoard == null) {
             solverPanel.setStatus("Muat file .txt terlebih dahulu.", UITheme.RED);
@@ -374,7 +374,7 @@ public class MainWindow extends JFrame {
                 switch (algorithm) {
                     case 0:  return new UCS().solve(boardSnapshot);
                     case 2:  return new GBFS(heuristic).solve(boardSnapshot);
-                    case 3:  return new BruteForceBacktrack().solve(boardSnapshot);
+                    case 3:  return new DFS().solve(boardSnapshot);
                     default: return new Astar(heuristic).solve(boardSnapshot);
                 }
             }

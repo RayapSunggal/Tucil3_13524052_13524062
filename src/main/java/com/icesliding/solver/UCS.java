@@ -3,8 +3,6 @@ package com.icesliding.solver;
 import com.icesliding.model.Board;
 import com.icesliding.model.GameState;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.PriorityQueue;
 
 public class UCS {
@@ -17,7 +15,7 @@ public class UCS {
         PriorityQueue<GameState> open = new PriorityQueue<>(
                 (a, b) -> Integer.compare(a.gCost, b.gCost));
 
-        Map<String, Integer> best = new HashMap<>();
+        java.util.Set<String> visited = new java.util.HashSet<>();
         open.add(initial);
         int nodesVisited = 0;
 
@@ -25,8 +23,8 @@ public class UCS {
             GameState curr = open.poll();
             String key = curr.key();
 
-            if (best.containsKey(key) && best.get(key) <= curr.gCost) continue;
-            best.put(key, curr.gCost);
+            if (visited.contains(key)) continue;
+            visited.add(key);
             nodesVisited++;
 
             if (curr.nextCheckpoint > board.maxCheckpoint
@@ -41,9 +39,8 @@ public class UCS {
 
                 int newG = curr.gCost + slide[2];
                 GameState next = new GameState(slide[0], slide[1], slide[3], newG, curr, SlideSimulator.dirName(d));
-                String nextKey = next.key();
 
-                if (!best.containsKey(nextKey) || best.get(nextKey) > newG) {
+                if (!visited.contains(next.key())) {
                     open.add(next);
                 }
             }

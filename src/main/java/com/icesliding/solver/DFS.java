@@ -6,16 +6,16 @@ import com.icesliding.model.GameState;
 import java.util.HashSet;
 import java.util.Set;
 
-public class BruteForceBacktrack {
+public class DFS {
 
     private int       nodesVisited;
-    private GameState bestGoal;
+    private GameState firstGoal;
     private long      t0;
 
     public SolverResult solve(Board board) {
         t0           = System.currentTimeMillis();
         nodesVisited = 0;
-        bestGoal     = null;
+        firstGoal    = null;
 
         GameState initial = new GameState(board.startRow, board.startCol, 0, 0, null, '\0');
 
@@ -25,20 +25,20 @@ public class BruteForceBacktrack {
         dfs(board, initial, pathVisited);
 
         long elapsed = System.currentTimeMillis() - t0;
-        if (bestGoal != null) {
-            return SolverResult.found(bestGoal, nodesVisited, elapsed);
+        if (firstGoal != null) {
+            return SolverResult.found(firstGoal, nodesVisited, elapsed);
         }
         return SolverResult.notFound(nodesVisited, elapsed);
     }
 
-    private void dfs(Board board, GameState curr, Set<String> pathVisited) {
+    private boolean dfs(Board board, GameState curr, Set<String> pathVisited) {
         nodesVisited++;
 
         if (curr.nextCheckpoint > board.maxCheckpoint
                 && curr.row == board.goalRow
                 && curr.col == board.goalCol) {
-            if (bestGoal == null || curr.gCost < bestGoal.gCost) bestGoal = curr;
-            return;
+            firstGoal = curr;
+            return true;
         }
 
         for (int d = 0; d < SlideSimulator.dirCount(); d++) {
@@ -53,11 +53,11 @@ public class BruteForceBacktrack {
             String nextKey = next.key();
 
             if (pathVisited.contains(nextKey)) continue;
-            if (bestGoal != null && next.gCost >= bestGoal.gCost) continue;
 
             pathVisited.add(nextKey);
-            dfs(board, next, pathVisited);
+            if (dfs(board, next, pathVisited)) return true;
             pathVisited.remove(nextKey);
         }
+        return false;
     }
 }
