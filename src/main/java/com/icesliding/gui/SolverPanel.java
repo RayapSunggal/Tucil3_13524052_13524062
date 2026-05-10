@@ -18,7 +18,6 @@ import java.util.function.BiConsumer;
 
 class SolverPanel extends JPanel {
 
-    // algorithm: 0=UCS, 1=A*, 2=GBFS, 3=DFS
     private final ButtonGroup  algGroup = new ButtonGroup();
     private final JRadioButton ucsBtn   = new JRadioButton("UCS");
     private final JRadioButton astarBtn = new JRadioButton("A*");
@@ -37,14 +36,12 @@ class SolverPanel extends JPanel {
     private final JButton solveBtn  = new JButton("Cari Solusi");
     private final JLabel  statusLbl = new JLabel(" ");
 
-    // callback(algorithm, heuristic): algorithm 0=UCS,1=A*,2=GBFS,3=DFS; heuristic 1/2/3/4
     private BiConsumer<Integer, Integer> onSolve;
 
     SolverPanel() {
         setOpaque(false);
         setLayout(new BorderLayout());
 
-        // --- Algorithm row ---
         algGroup.add(ucsBtn); algGroup.add(astarBtn); algGroup.add(gbfsBtn); algGroup.add(bfBtn);
         astarBtn.setSelected(true);
         styleRadio(ucsBtn); styleRadio(astarBtn); styleRadio(gbfsBtn); styleRadio(bfBtn);
@@ -60,7 +57,6 @@ class SolverPanel extends JPanel {
         algRow.add(gbfsBtn);
         algRow.add(bfBtn);
 
-        // --- Heuristic section ---
         hGroup.add(h1Btn); hGroup.add(h2Btn); hGroup.add(h3Btn); hGroup.add(h4Btn);
         h1Btn.setSelected(true);
         styleRadio(h1Btn); styleRadio(h2Btn); styleRadio(h3Btn); styleRadio(h4Btn);
@@ -76,13 +72,11 @@ class SolverPanel extends JPanel {
         radioBox.add(h3Btn);
         radioBox.add(h4Btn);
 
-        // Toggle heuristic visibility based on algorithm
         ucsBtn.addActionListener(e -> updateHeuristicVisibility());
         astarBtn.addActionListener(e -> updateHeuristicVisibility());
         gbfsBtn.addActionListener(e -> updateHeuristicVisibility());
         bfBtn.addActionListener(e -> updateHeuristicVisibility());
 
-        // --- Solve button ---
         solveBtn.setFont(UITheme.BODY_BOLD);
         solveBtn.setBackground(UITheme.TEAL);
         solveBtn.setForeground(Color.WHITE);
@@ -100,7 +94,6 @@ class SolverPanel extends JPanel {
         btnRow.setOpaque(false);
         btnRow.add(solveBtn, BorderLayout.CENTER);
 
-        // --- Status ---
         statusLbl.setFont(UITheme.SMALL);
         statusLbl.setForeground(UITheme.INK_MUTED);
 
@@ -108,7 +101,6 @@ class SolverPanel extends JPanel {
         statusRow.setOpaque(false);
         statusRow.add(statusLbl);
 
-        // --- Assemble ---
         JPanel content = new JPanel();
         content.setOpaque(false);
         content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
@@ -168,7 +160,7 @@ class SolverPanel extends JPanel {
         if (ucsBtn.isSelected())  return 0;
         if (gbfsBtn.isSelected()) return 2;
         if (bfBtn.isSelected())   return 3;
-        return 1; // A*
+        return 1;
     }
 
     int selectedHeuristic() {

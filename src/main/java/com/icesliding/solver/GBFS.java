@@ -18,7 +18,6 @@ public class GBFS {
 
         GameState initial = new GameState(board.startRow, board.startCol, 0, 0, null, '\0');
 
-        // GBFS: order by heuristic only, ignoring path cost
         PriorityQueue<GameState> open = new PriorityQueue<>(
                 (a, b) -> Double.compare(h(a, board), h(b, board)));
 
@@ -65,7 +64,6 @@ public class GBFS {
         }
     }
 
-    // H1: Manhattan via checkpoint berikutnya → tujuan
     private int h1(GameState s, Board board) {
         if (s.nextCheckpoint > board.maxCheckpoint)
             return Math.abs(s.row - board.goalRow) + Math.abs(s.col - board.goalCol);
@@ -75,7 +73,6 @@ public class GBFS {
                 + Math.abs(cr - board.goalRow) + Math.abs(cc - board.goalCol);
     }
 
-    // H2: Euclidean via checkpoint berikutnya → tujuan
     private double h2(GameState s, Board board) {
         if (s.nextCheckpoint > board.maxCheckpoint) {
             double dr = s.row - board.goalRow, dc = s.col - board.goalCol;
@@ -88,7 +85,6 @@ public class GBFS {
         return Math.sqrt(dr1 * dr1 + dc1 * dc1) + Math.sqrt(dr2 * dr2 + dc2 * dc2);
     }
 
-    // H3: Chebyshev distance via checkpoint berikutnya → tujuan
     private double h3(GameState s, Board board) {
         if (s.nextCheckpoint > board.maxCheckpoint)
             return Math.max(Math.abs(s.row - board.goalRow), Math.abs(s.col - board.goalCol));
@@ -98,7 +94,6 @@ public class GBFS {
              + Math.max(Math.abs(cr - board.goalRow), Math.abs(cc - board.goalCol));
     }
 
-    // H4: Minkowski distance (p=3) via checkpoint berikutnya → tujuan
     private double h4(GameState s, Board board) {
         final double P = 3.0;
         if (s.nextCheckpoint > board.maxCheckpoint) {
