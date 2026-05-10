@@ -289,8 +289,6 @@ public class MainWindow extends JFrame {
         return btn;
     }
 
-    // ── File loading ─────────────────────────────────────────────────────────
-
     private void loadFile(File file) {
         if (file == null) return;
         if (currentWorker != null && !currentWorker.isDone()) currentWorker.cancel(true);
@@ -353,9 +351,6 @@ public class MainWindow extends JFrame {
         repaint();
     }
 
-    // ── Solver ────────────────────────────────────────────────────────────────
-
-    // algorithm: 0=UCS, 1=A*, 2=GBFS, 3=DFS
     private void runSolver(int algorithm, int heuristic) {
         if (currentBoard == null) {
             solverPanel.setStatus("Muat file .txt terlebih dahulu.", UITheme.RED);
@@ -421,7 +416,6 @@ public class MainWindow extends JFrame {
         repaint();
     }
 
-    // ── Playback ──────────────────────────────────────────────────────────────
 
     private void updatePlaybackStep(int step) {
         if (currentResult == null || !currentResult.found) return;
@@ -464,7 +458,6 @@ public class MainWindow extends JFrame {
         if (playPauseBtn  != null) playPauseBtn.setText("▶ Play");
     }
 
-    // ── Save ──────────────────────────────────────────────────────────────────
 
     private void saveSolution() {
         if (currentResult == null || !currentResult.found) return;
@@ -519,8 +512,6 @@ public class MainWindow extends JFrame {
         }
         return sb.toString();
     }
-
-    // ── Inner components ──────────────────────────────────────────────────────
 
     static final class RoundedPanel extends JPanel {
         private final Color fill;

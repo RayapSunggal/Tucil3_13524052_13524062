@@ -25,10 +25,9 @@ public class BoardPanel extends JPanel {
     private static final Color PATH_HIGHLIGHT_BG     = new Color(0xBBDEF0);
     private static final Color PATH_HIGHLIGHT_BORDER = new Color(0x74B8D8);
 
-    // Animation constants
     private static final int   ANIM_FPS      = 60;
-    private static final int   ANIM_INTERVAL = 1000 / ANIM_FPS; // ~16ms
-    private static final float ANIM_STEPS    = 12f; // frames per tile
+    private static final int   ANIM_INTERVAL = 1000 / ANIM_FPS;
+    private static final float ANIM_STEPS    = 12f;
 
     private Board board;
 
@@ -38,7 +37,6 @@ public class BoardPanel extends JPanel {
     private int          collectedCheckpoints = 0;
     private Set<Integer> pathSet = new HashSet<>();
 
-    // Smooth animation state (X = horizontal/col offset, Y = vertical/row offset)
     private float  animOffsetX;
     private float  animOffsetY;
     private float  animVelX;
@@ -46,11 +44,8 @@ public class BoardPanel extends JPanel {
     private int    animFramesLeft = 0;
     private Timer  animTimer;
 
-    // Checkpoint tiles crossed mid-slide that should flip appearance as actor passes through
-    // Each entry: [row, col, newCollectedValue, frameIndexWhenActorReachesTile]
     private int[][] animCheckpointEvents = new int[0][];
 
-    // Cached tile size (updated in paintBoard, used by animation calculations)
     private int cachedTileSize = MIN_TILE;
 
     public BoardPanel() {
@@ -139,7 +134,6 @@ public class BoardPanel extends JPanel {
             return;
         }
 
-        // Start with the checkpoint count from before this move; let events update it mid-slide
         collectedCheckpoints = prevCheckpoints;
 
         int numTiles  = Math.abs(deltaRow) + Math.abs(deltaCol);
@@ -151,18 +145,14 @@ public class BoardPanel extends JPanel {
         animVelX = -animOffsetX / numFrames;
         animVelY = -animOffsetY / numFrames;
 
-        // Build checkpoint flip events: for each checkpoint newly collected during this slide,
-        // compute which frame the actor's pixel center first lands on that tile.
         int dr = Integer.signum(deltaRow);
         int dc = Integer.signum(deltaCol);
         List<int[]> events = new java.util.ArrayList<>();
         for (int cp = prevCheckpoints; cp < nextCheckpoints; cp++) {
-            // Find tile index along the path where this checkpoint sits
             int r = prevPos[0], c = prevPos[1];
             for (int t = 1; t <= numTiles; t++) {
                 r += dr; c += dc;
                 if (board.grid[r][c] == (char) ('0' + cp)) {
-                    // Actor center reaches this tile at the start of tile t (frame index)
                     int triggerFrame = numFrames - (int) ((numTiles - t) * ANIM_STEPS);
                     events.add(new int[]{triggerFrame, cp + 1});
                     break;
@@ -178,7 +168,6 @@ public class BoardPanel extends JPanel {
             animOffsetX += animVelX;
             animOffsetY += animVelY;
 
-            // Flip checkpoint appearance as actor pixel-center crosses each checkpoint tile
             int framesElapsed = totalFrames - animFramesLeft;
             for (int[] ev : animCheckpointEvents) {
                 if (framesElapsed >= ev[0] && collectedCheckpoints < ev[1]) {
@@ -278,15 +267,13 @@ public class BoardPanel extends JPanel {
         g2.setColor(new Color(0, 0, 0, 18));
         g2.fill(new RoundRectangle2D.Float(startX + 8, startY + 10, boardW, boardH, 12, 12));
 
-        // Draw all non-actor tiles
         for (int r = 0; r < board.rows; r++) {
             for (int c = 0; c < board.cols; c++) {
-                if (playbackMode && r == actorRow && c == actorCol) continue; // draw actor last
+                if (playbackMode && r == actorRow && c == actorCol) continue;
                 paintTile(g2, r, c, startX + c * tile, startY + r * tile, tile, 0, 0);
             }
         }
 
-        // Draw actor on top with smooth pixel offset
         if (playbackMode && actorRow >= 0) {
             int ax = startX + actorCol * tile + (int) animOffsetX;
             int ay = startY + actorRow * tile + (int) animOffsetY;
