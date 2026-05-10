@@ -202,7 +202,7 @@ public class MainWindow extends JFrame {
         stepLabel.setFont(UITheme.BODY_BOLD);
         stepLabel.setForeground(UITheme.INK);
 
-        speedSlider = new JSlider(1, 10, 5);
+        speedSlider = new JSlider(1, 10, 1);
         speedSlider.setOpaque(false);
         speedSlider.setPreferredSize(new Dimension(100, 24));
 
@@ -247,14 +247,15 @@ public class MainWindow extends JFrame {
     }
 
     private JPanel buildLegend() {
-        JPanel legend = new JPanel(new GridLayout(1, 6, 8, 0));
+        JPanel legend = new JPanel(new GridLayout(1, 7, 8, 0));
         legend.setOpaque(false);
         legend.add(new LegendItem(UITheme.ICE,              "Path"));
-        legend.add(new LegendItem(new Color(0xBBDEF0),      "Solusi"));
+        legend.add(new LegendItem(new Color(0x7BE38A),      "Solusi"));
         legend.add(new LegendItem(UITheme.STONE,            "Batu"));
-        legend.add(new LegendItem(UITheme.RED_SOFT,         "Lava"));
-        legend.add(new LegendItem(UITheme.TEAL_SOFT,        "Aktor"));
-        legend.add(new LegendItem(UITheme.GREEN_SOFT,       "Tujuan"));
+        legend.add(new LegendItem(UITheme.LAVA_SOFT,        "Lava"));
+        legend.add(new LegendItem(UITheme.AMBER_SOFT,       "Checkpoint"));
+        legend.add(new LegendItem(UITheme.ACTOR_SOFT,       "Aktor"));
+        legend.add(new LegendItem(UITheme.GOAL_SOFT,        "Tujuan"));
         return legend;
     }
 
@@ -439,17 +440,28 @@ public class MainWindow extends JFrame {
             if (playbackStep >= currentResult.positions.size() - 1) updatePlaybackStep(0);
             isPlaying = true;
             playPauseBtn.setText("⏸ Pause");
-            int intervalMs = 1100 - speedSlider.getValue() * 100;
-            playbackTimer = new Timer(intervalMs, null);
-            playbackTimer.addActionListener(e -> {
-                if (playbackStep < currentResult.positions.size() - 1) {
-                    updatePlaybackStep(playbackStep + 1);
-                } else {
-                    stopPlayback();
-                }
-            });
-            playbackTimer.start();
+            advancePlaybackStep();
         }
+    }
+
+    private void advancePlaybackStep() {
+        if (!isPlaying || currentResult == null) return;
+        if (playbackStep >= currentResult.positions.size() - 1) {
+            stopPlayback();
+            return;
+        }
+        int nextStep = playbackStep + 1;
+        int animMs = boardPanel.stepDurationMs(currentResult.positions, nextStep);
+        int userGap = 1100 - speedSlider.getValue() * 100;
+        int delay = animMs + userGap;
+        updatePlaybackStep(nextStep);
+        playbackTimer = new Timer(delay, null);
+        playbackTimer.setRepeats(false);
+        playbackTimer.addActionListener(e -> {
+            if (!isPlaying) return;
+            advancePlaybackStep();
+        });
+        playbackTimer.start();
     }
 
     private void stopPlayback() {
@@ -544,7 +556,7 @@ public class MainWindow extends JFrame {
             this.color = color;
             this.label = label;
             setOpaque(false);
-            setPreferredSize(new Dimension(70, 24));
+            setPreferredSize(new Dimension(88, 24));
             setBorder(BorderFactory.createEmptyBorder());
         }
 

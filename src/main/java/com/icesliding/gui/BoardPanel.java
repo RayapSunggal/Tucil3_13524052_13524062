@@ -22,12 +22,15 @@ public class BoardPanel extends JPanel {
     private static final int MAX_TILE = 68;
     private static final int PADDING  = 28;
 
-    private static final Color PATH_HIGHLIGHT_BG     = new Color(0xBBDEF0);
-    private static final Color PATH_HIGHLIGHT_BORDER = new Color(0x74B8D8);
+    private static final Color PATH_HIGHLIGHT_BG     = new Color(0x7BE38A);
+    private static final Color PATH_HIGHLIGHT_BORDER = new Color(0x1F9D3D);
+    private static final Color PATH_HIGHLIGHT_INK    = new Color(0x0E5023);
 
-    private static final int   ANIM_FPS      = 60;
-    private static final int   ANIM_INTERVAL = 1000 / ANIM_FPS;
-    private static final float ANIM_STEPS    = 12f;
+    private static final int   ANIM_FPS         = 60;
+    private static final int   ANIM_INTERVAL    = 1000 / ANIM_FPS;
+    private static final float ANIM_STEPS       = 12f;
+    private static final int   SETTLE_FRAMES    = 9;
+    private static final int   COLLECT_DELAY    = 6;
 
     private Board board;
 
@@ -136,14 +139,15 @@ public class BoardPanel extends JPanel {
 
         collectedCheckpoints = prevCheckpoints;
 
-        int numTiles  = Math.abs(deltaRow) + Math.abs(deltaCol);
-        int numFrames = (int) (numTiles * ANIM_STEPS);
+        int numTiles    = Math.abs(deltaRow) + Math.abs(deltaCol);
+        int motionFrames = (int) (numTiles * ANIM_STEPS);
+        int numFrames    = motionFrames + SETTLE_FRAMES + COLLECT_DELAY;
         animFramesLeft = numFrames;
 
         animOffsetX = -deltaCol * tileSize;
         animOffsetY = -deltaRow * tileSize;
-        animVelX = -animOffsetX / numFrames;
-        animVelY = -animOffsetY / numFrames;
+        animVelX = -animOffsetX / motionFrames;
+        animVelY = -animOffsetY / motionFrames;
 
         int dr = Integer.signum(deltaRow);
         int dc = Integer.signum(deltaCol);
@@ -153,7 +157,9 @@ public class BoardPanel extends JPanel {
             for (int t = 1; t <= numTiles; t++) {
                 r += dr; c += dc;
                 if (board.grid[r][c] == (char) ('0' + cp)) {
-                    int triggerFrame = numFrames - (int) ((numTiles - t) * ANIM_STEPS);
+                    int triggerFrame = (t == numTiles)
+                            ? (int) (t * ANIM_STEPS) + COLLECT_DELAY
+                            : (int) (t * ANIM_STEPS);
                     events.add(new int[]{triggerFrame, cp + 1});
                     break;
                 }
@@ -161,14 +167,21 @@ public class BoardPanel extends JPanel {
         }
         animCheckpointEvents = events.toArray(new int[0][]);
 
-        final int totalFrames = numFrames;
+        final int totalMotionFrames = motionFrames;
         animTimer = new Timer(ANIM_INTERVAL, null);
         animTimer.addActionListener(e -> {
             animFramesLeft--;
-            animOffsetX += animVelX;
-            animOffsetY += animVelY;
+            int framesElapsed = numFrames - animFramesLeft;
 
-            int framesElapsed = totalFrames - animFramesLeft;
+            if (framesElapsed <= totalMotionFrames) {
+                animOffsetX += animVelX;
+                animOffsetY += animVelY;
+                if (framesElapsed == totalMotionFrames) {
+                    animOffsetX = 0;
+                    animOffsetY = 0;
+                }
+            }
+
             for (int[] ev : animCheckpointEvents) {
                 if (framesElapsed >= ev[0] && collectedCheckpoints < ev[1]) {
                     collectedCheckpoints = ev[1];
@@ -193,6 +206,16 @@ public class BoardPanel extends JPanel {
             animTimer.stop();
             animTimer = null;
         }
+    }
+
+    public int stepDurationMs(List<int[]> positions, int step) {
+        if (step <= 0 || step >= positions.size()) return 0;
+        int[] prev = positions.get(step - 1);
+        int[] cur  = positions.get(step);
+        int numTiles = Math.abs(cur[0] - prev[0]) + Math.abs(cur[1] - prev[1]);
+        if (numTiles == 0) return 0;
+        int frames = (int) (numTiles * ANIM_STEPS) + SETTLE_FRAMES + COLLECT_DELAY;
+        return frames * ANIM_INTERVAL;
     }
 
     public void clearPlayback() {
@@ -269,7 +292,6 @@ public class BoardPanel extends JPanel {
 
         for (int r = 0; r < board.rows; r++) {
             for (int c = 0; c < board.cols; c++) {
-                if (playbackMode && r == actorRow && c == actorCol) continue;
                 paintTile(g2, r, c, startX + c * tile, startY + r * tile, tile, 0, 0);
             }
         }
@@ -277,8 +299,21 @@ public class BoardPanel extends JPanel {
         if (playbackMode && actorRow >= 0) {
             int ax = startX + actorCol * tile + (int) animOffsetX;
             int ay = startY + actorRow * tile + (int) animOffsetY;
-            paintTile(g2, actorRow, actorCol, ax, ay, tile, 0, 0);
+            paintActor(g2, ax, ay, tile);
         }
+    }
+
+    private void paintActor(Graphics2D g2, int x, int y, int tile) {
+        int arc = Math.max(7, tile / 5);
+        g2.setColor(UITheme.ACTOR_SOFT);
+        g2.fillRect(x, y, tile, tile);
+        g2.setColor(UITheme.ACTOR);
+        g2.setStroke(new BasicStroke(2f));
+        g2.draw(new RoundRectangle2D.Float(x + 2.5f, y + 2.5f, tile - 5, tile - 5, arc, arc));
+        g2.setFont(tile >= 44 ? UITheme.SECTION.deriveFont(15f) : UITheme.BODY_BOLD);
+        g2.setColor(UITheme.ACTOR_INK);
+        FontMetrics fm = g2.getFontMetrics();
+        g2.drawString("Z", x + (tile - fm.stringWidth("Z")) / 2, y + (tile + fm.getAscent()) / 2 - 2);
     }
 
     private void paintTile(Graphics2D g2, int row, int col, int x, int y, int tile,
@@ -309,15 +344,11 @@ public class BoardPanel extends JPanel {
     }
 
     private boolean isSpecial(int row, int col, char value) {
-        if (playbackMode && row == actorRow && col == actorCol) return true;
         return value == 'Z' || value == 'O';
     }
 
     private TileStyle styleFor(int row, int col, char value) {
         if (playbackMode) {
-            if (row == actorRow && col == actorCol) {
-                return new TileStyle(UITheme.TEAL_SOFT, UITheme.TEAL, UITheme.TEAL, "Z");
-            }
             if (value == 'Z') {
                 return pathHighlight();
             }
@@ -327,9 +358,9 @@ public class BoardPanel extends JPanel {
         }
 
         if (value == 'X') return new TileStyle(UITheme.STONE, new Color(0x21313A), new Color(0xF2F5F6), "X");
-        if (value == 'L') return new TileStyle(UITheme.RED_SOFT,   UITheme.RED,   UITheme.RED,   "L");
-        if (value == 'O') return new TileStyle(UITheme.GREEN_SOFT, UITheme.GREEN, UITheme.GREEN, "O");
-        if (value == 'Z') return new TileStyle(UITheme.TEAL_SOFT,  UITheme.TEAL,  UITheme.TEAL,  "Z");
+        if (value == 'L') return new TileStyle(UITheme.LAVA_SOFT, UITheme.LAVA, UITheme.LAVA_INK, "L");
+        if (value == 'O') return new TileStyle(UITheme.GOAL_SOFT, UITheme.GOAL, UITheme.GOAL_INK, "O");
+        if (value == 'Z') return new TileStyle(UITheme.ACTOR_SOFT, UITheme.ACTOR, UITheme.ACTOR_INK, "Z");
         if (value >= '0' && value <= '9') {
             return new TileStyle(UITheme.AMBER_SOFT, UITheme.AMBER, new Color(0xA15F00), String.valueOf(value));
         }
@@ -341,7 +372,7 @@ public class BoardPanel extends JPanel {
     }
 
     private static TileStyle pathHighlight() {
-        return new TileStyle(PATH_HIGHLIGHT_BG, PATH_HIGHLIGHT_BORDER, UITheme.INK_MUTED, null);
+        return new TileStyle(PATH_HIGHLIGHT_BG, PATH_HIGHLIGHT_BORDER, PATH_HIGHLIGHT_INK, null);
     }
 
     private void drawCentered(Graphics2D g2, String text, int x, int baselineY, int width) {
