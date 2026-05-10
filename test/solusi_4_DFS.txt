@@ -1,0 +1,86 @@
+Solusi Yang Ditemukan : RDRUDLRU
+Cost dari Solusi      : 39
+Waktu eksekusi        : 0 ms
+Banyak iterasi        : 17 iterasi
+
+Initial
+XXXXXXXXX
+XZ**X**OX
+X*X***X*X
+X*X*0*X*X
+X*XX**X*X
+X*******X
+XXXXXXXXX
+
+Step 1 : R
+XXXXXXXXX
+X**ZX**OX
+X*X***X*X
+X*X*0*X*X
+X*XX**X*X
+X*******X
+XXXXXXXXX
+
+Step 2 : D
+XXXXXXXXX
+X***X**OX
+X*X***X*X
+X*XZ0*X*X
+X*XX**X*X
+X*******X
+XXXXXXXXX
+
+Step 3 : R
+XXXXXXXXX
+X***X**OX
+X*X***X*X
+X*X**ZX*X
+X*XX**X*X
+X*******X
+XXXXXXXXX
+
+Step 4 : U
+XXXXXXXXX
+X***XZ*OX
+X*X***X*X
+X*X***X*X
+X*XX**X*X
+X*******X
+XXXXXXXXX
+
+Step 5 : D
+XXXXXXXXX
+X***X**OX
+X*X***X*X
+X*X***X*X
+X*XX**X*X
+X****Z**X
+XXXXXXXXX
+
+Step 6 : L
+XXXXXXXXX
+X***X**OX
+X*X***X*X
+X*X***X*X
+X*XX**X*X
+XZ******X
+XXXXXXXXX
+
+Step 7 : R
+XXXXXXXXX
+X***X**OX
+X*X***X*X
+X*X***X*X
+X*XX**X*X
+X******ZX
+XXXXXXXXX
+
+Step 8 : U
+XXXXXXXXX
+X***X**ZX
+X*X***X*X
+X*X***X*X
+X*XX**X*X
+X*******X
+XXXXXXXXX
+

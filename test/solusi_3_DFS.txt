@@ -1,0 +1,115 @@
+Solusi Yang Ditemukan : RDLRUDURD
+Cost dari Solusi      : 129
+Waktu eksekusi        : 0 ms
+Banyak iterasi        : 20 iterasi
+
+Initial
+XXXXXXXXX
+XZ*0X***X
+X*******X
+X**1****X
+X*******X
+X**2*3X*X
+X**X****X
+X****4*OX
+XXXXXXXXX
+
+Step 1 : R
+XXXXXXXXX
+X**ZX***X
+X*******X
+X**1****X
+X*******X
+X**2*3X*X
+X**X****X
+X****4*OX
+XXXXXXXXX
+
+Step 2 : D
+XXXXXXXXX
+X***X***X
+X*******X
+X*******X
+X*******X
+X**Z*3X*X
+X**X****X
+X****4*OX
+XXXXXXXXX
+
+Step 3 : L
+XXXXXXXXX
+X***X***X
+X*******X
+X*******X
+X*******X
+XZ***3X*X
+X**X****X
+X****4*OX
+XXXXXXXXX
+
+Step 4 : R
+XXXXXXXXX
+X***X***X
+X*******X
+X*******X
+X*******X
+X****ZX*X
+X**X****X
+X****4*OX
+XXXXXXXXX
+
+Step 5 : U
+XXXXXXXXX
+X***XZ**X
+X*******X
+X*******X
+X*******X
+X*****X*X
+X**X****X
+X****4*OX
+XXXXXXXXX
+
+Step 6 : D
+XXXXXXXXX
+X***X***X
+X*******X
+X*******X
+X*******X
+X*****X*X
+X**X****X
+X****Z*OX
+XXXXXXXXX
+
+Step 7 : U
+XXXXXXXXX
+X***XZ**X
+X*******X
+X*******X
+X*******X
+X*****X*X
+X**X****X
+X******OX
+XXXXXXXXX
+
+Step 8 : R
+XXXXXXXXX
+X***X**ZX
+X*******X
+X*******X
+X*******X
+X*****X*X
+X**X****X
+X******OX
+XXXXXXXXX
+
+Step 9 : D
+XXXXXXXXX
+X***X***X
+X*******X
+X*******X
+X*******X
+X*****X*X
+X**X****X
+X******ZX
+XXXXXXXXX
+

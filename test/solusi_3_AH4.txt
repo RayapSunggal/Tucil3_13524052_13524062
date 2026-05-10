@@ -1,0 +1,71 @@
+Solusi Yang Ditemukan : RDRDR
+Cost dari Solusi      : 48
+Waktu eksekusi        : 0 ms
+Banyak iterasi        : 13 iterasi
+
+Initial
+XXXXXXXXX
+XZ*0X***X
+X*******X
+X**1****X
+X*******X
+X**2*3X*X
+X**X****X
+X****4*OX
+XXXXXXXXX
+
+Step 1 : R
+XXXXXXXXX
+X**ZX***X
+X*******X
+X**1****X
+X*******X
+X**2*3X*X
+X**X****X
+X****4*OX
+XXXXXXXXX
+
+Step 2 : D
+XXXXXXXXX
+X***X***X
+X*******X
+X*******X
+X*******X
+X**Z*3X*X
+X**X****X
+X****4*OX
+XXXXXXXXX
+
+Step 3 : R
+XXXXXXXXX
+X***X***X
+X*******X
+X*******X
+X*******X
+X****ZX*X
+X**X****X
+X****4*OX
+XXXXXXXXX
+
+Step 4 : D
+XXXXXXXXX
+X***X***X
+X*******X
+X*******X
+X*******X
+X*****X*X
+X**X****X
+X****Z*OX
+XXXXXXXXX
+
+Step 5 : R
+XXXXXXXXX
+X***X***X
+X*******X
+X*******X
+X*******X
+X*****X*X
+X**X****X
+X******ZX
+XXXXXXXXX
+
